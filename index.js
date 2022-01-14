@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const port = process.env.LISTEN_PORT;
 const userRouter = require("./src/routes/user");
+const authRouter = require("./src/routes/auth");
 
 mongoose
   .connect(process.env.MONGO_URL)
@@ -18,6 +19,7 @@ mongoose
 
 app.use(cors());
 app.use(express.json());
+app.use("/auth", authRouter);
 app.use("/user", userRouter);
 
 app.listen(port || 3000, () => {

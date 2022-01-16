@@ -1,7 +1,10 @@
 const router = require("express").Router();
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
-const { verifyTokenAndAuthorization } = require("./verifyToken");
+const {
+  verifyTokenAndAuthorization,
+  verifyTokenAndAdmin,
+} = require("./verifyToken");
 
 router.get("/", (req, res) => {
   res.send("hallo");
@@ -35,10 +38,24 @@ router.put("/:id", verifyTokenAndAuthorization, async (req, res) => {
   }
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", verifyTokenAndAuthorization, async (req, res) => {
   const { id } = req.params;
+  try {
+    await User.findByIdAndDelete(id);
+    res.status(200).json("User has been deleted !!!");
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
 
-  // res.json(id);
+router.get("/:id", verifyTokenAndAdmin, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await User.findById(id);
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 module.exports = router;
